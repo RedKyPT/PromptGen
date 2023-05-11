@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gerador de Prompts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #f0f0f0;
+        }
+
+        h1 {
+            color: #fafafa;
+        }
+
+        select, button, input {
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        #resultado {
+            margin-top: 20px;
+            font-weight: bold;
+            border: 1px solid #ccc;
+            padding: 10px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gerador de Prompts</h1>
+    
+    <div>
+        <label for="tipoDeImagem">Tipo de Imagem:</label>
+        <select id="tipoDeImagem">
+            <option value="a cartoon of">a cartoon of</option>
+            <option value="a depiction of">a depiction of</option>
+            <option value="a drawing of">a drawing of</option>
+            <option value="a figure of">a figure of</option>
+            <option value="a headshot of">a headshot of</option>
+        </select>
+        <input type="text" id="tipoDeImagemPersonalizado" placeholder="Texto Personalisado" />
+    </div>
+    
+    <div>
+        <label for="sujeito">Sujeito:</label>
+        <select id="sujeito">
+            <option value="a girl">a girl</option>
+            <option value="a boy">a boy</option>
+            <option value="a man">a man</option>
+            <option value="a woman">a woman</option>
+        </select>
+        <input type="text" id="sujeitoPersonalizado" placeholder="Texto Personalisado" />
+    </div>
+
+    <button onclick="gerarPrompt()">Gerar</button>
+
+    <div id="resultado"></div>
+    <button onclick="copiarPrompt()">Copiar</button>
+	<button onclick="gerarPromptAleatoria()">Gerar aleatório</button>
+
+    <script>
+        function gerarPrompt() {
+            var tipoDeImagem = document.getElementById("tipoDeImagemPersonalizado").value || document.getElementById("tipoDeImagem").value;
+            var sujeito = document.getElementById("sujeitoPersonalizado").value || document.getElementById("sujeito").value;
+
+            var prompt = tipoDeImagem + " " + sujeito;
+
+            document.getElementById("resultado").innerHTML = prompt;
+        }
+
+        function copiarPrompt() {
+            var promptText = document.getElementById("resultado").innerText;
+
+            var tempElement = document.createElement('textarea');
+            tempElement.value = promptText;
+            document.body.appendChild(tempElement);
+            tempElement.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempElement);
+            
+            alert("Prompt copiada: " + promptText);
+        }
+		function gerarPromptAleatoria() {
+			if (document.getElementById("tipoDeImagemPersonalizado").value || document.getElementById("sujeitoPersonalizado").value) {
+				alert("Por favor, limpe os campos de texto personalizados antes de gerar uma prompt aleatória.");
+				return;
+			}
+
+			var tipoDeImagemOptions = document.getElementById("tipoDeImagem").options;
+			var sujeitoOptions = document.getElementById("sujeito").options;
+
+			var randomTipoDeImagem = tipoDeImagemOptions[Math.floor(Math.random() * tipoDeImagemOptions.length)].value;
+			var randomSujeito = sujeitoOptions[Math.floor(Math.random() * sujeitoOptions.length)].value;
+
+			var prompt = randomTipoDeImagem + " " + randomSujeito;
+
+			document.getElementById("resultado").innerHTML = prompt;
+		}
+
+    </script>
