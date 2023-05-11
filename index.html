@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Gerador de Prompts</title>
+	<title>Gerador de Prompts</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -33,74 +33,109 @@
     </style>
 </head>
 <body>
-    <h1>Gerador de Prompts</h1>
-    
+	<h1>Gerador de Prompts</h1>
     <div>
-        <label for="tipoDeImagem">Tipo de Imagem:</label>
-        <select id="tipoDeImagem">
-            <option value="a cartoon of">a cartoon of</option>
-            <option value="a depiction of">a depiction of</option>
-            <option value="a drawing of">a drawing of</option>
-            <option value="a figure of">a figure of</option>
-            <option value="a headshot of">a headshot of</option>
-        </select>
-        <input type="text" id="tipoDeImagemPersonalizado" placeholder="Texto Personalisado" />
-    </div>
-    
-    <div>
-        <label for="sujeito">Sujeito:</label>
-        <select id="sujeito">
-            <option value="a girl">a girl</option>
-            <option value="a boy">a boy</option>
-            <option value="a man">a man</option>
-            <option value="a woman">a woman</option>
-        </select>
-        <input type="text" id="sujeitoPersonalizado" placeholder="Texto Personalisado" />
-    </div>
-
-    <button onclick="gerarPrompt()">Gerar</button>
-
+    <select id="tipoDeImagem">
+        <option value="">Selecione um tipo de imagem</option>
+        <option value="a cartoon of">a cartoon of</option>
+        <option value="a depiction of">a depiction of</option>
+        <option value="a drawing of">a drawing of</option>
+        <option value="a figure of">a figure of</option>
+        <option value="a headshot of">a headshot of</option>
+    </select>
+    <input type="text" id="tipoDeImagemPersonalizado" oninput="resetSelection('tipoDeImagem')">
+    <input type="checkbox" onclick="toggleLock('tipoDeImagem')"> Lock
+	</div>
+	<div>
+    <select id="sujeito">
+        <option value="">Selecione um sujeito</option>
+        <option value="a girl">a girl</option>
+        <option value="a boy">a boy</option>
+        <option value="a man">a man</option>
+        <option value="a woman">a woman</option>
+    </select>
+    <input type="text" id="sujeitoPersonalizado" oninput="resetSelection('sujeito')">
+    <input type="checkbox" onclick="toggleLock('sujeito')"> Lock
+	</div>
+	
     <div id="resultado"></div>
     <button onclick="copiarPrompt()">Copiar</button>
-	<button onclick="gerarPromptAleatoria()">Gerar aleatório</button>
+    <button onclick="gerarAleatorio()">Gerar aleatório</button>
+    <div style="margin-top: 20px;">
+        <button onclick="toggleQuality()">Mas.BestQ</button>
+    </div>
+	<button onclick="clearPrompt()">Clear</button>
 
-    <script>
-        function gerarPrompt() {
-            var tipoDeImagem = document.getElementById("tipoDeImagemPersonalizado").value || document.getElementById("tipoDeImagem").value;
-            var sujeito = document.getElementById("sujeitoPersonalizado").value || document.getElementById("sujeito").value;
+<script>
+    var qualityEnabled = false;
+    var selecoes = ["tipoDeImagem", "sujeito"];
+    var locks = {};
 
-            var prompt = tipoDeImagem + " " + sujeito;
-
-            document.getElementById("resultado").innerHTML = prompt;
-        }
-
-        function copiarPrompt() {
-            var promptText = document.getElementById("resultado").innerText;
-
-            var tempElement = document.createElement('textarea');
-            tempElement.value = promptText;
-            document.body.appendChild(tempElement);
-            tempElement.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempElement);
-            
-            alert("Prompt copiada: " + promptText);
-        }
-		function gerarPromptAleatoria() {
-			if (document.getElementById("tipoDeImagemPersonalizado").value || document.getElementById("sujeitoPersonalizado").value) {
-				alert("Por favor, limpe os campos de texto personalizados antes de gerar uma prompt aleatória.");
-				return;
-			}
-
-			var tipoDeImagemOptions = document.getElementById("tipoDeImagem").options;
-			var sujeitoOptions = document.getElementById("sujeito").options;
-
-			var randomTipoDeImagem = tipoDeImagemOptions[Math.floor(Math.random() * tipoDeImagemOptions.length)].value;
-			var randomSujeito = sujeitoOptions[Math.floor(Math.random() * sujeitoOptions.length)].value;
-
-			var prompt = randomTipoDeImagem + " " + randomSujeito;
-
-			document.getElementById("resultado").innerHTML = prompt;
+	window.onload = function() {
+		gerarPrompt();
+		for (var i = 0; i < selecoes.length; i++) {
+			var id = selecoes[i];
+			document.getElementById(id).addEventListener('change', gerarPrompt);
 		}
+	}
 
-    </script>
+    function gerarPrompt() {
+        var tipoDeImagem = document.getElementById("tipoDeImagemPersonalizado").value || document.getElementById("tipoDeImagem").value;
+        var sujeito = document.getElementById("sujeitoPersonalizado").value || document.getElementById("sujeito").value;
+
+        var prompt = tipoDeImagem + " " + sujeito;
+
+        if (qualityEnabled) {
+            prompt = "masterpiece, best quality, " + prompt;
+        }
+
+        document.getElementById("resultado").innerHTML = prompt;
+    }
+
+    function copiarPrompt() {
+        var textArea = document.createElement("textarea");
+        textArea.value = document.getElementById("resultado").textContent;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("Copy");
+        textArea.remove();
+    }
+	function gerarAleatorio() {
+		for (var i = 0; i < selecoes.length; i++) {
+			var id = selecoes[i];
+			if (!locks[id]) {
+				document.getElementById(id).selectedIndex = Math.floor(Math.random() * 5) + 1;
+			}
+		}
+		gerarPrompt();
+	}
+    function toggleQuality() {
+        qualityEnabled = !qualityEnabled;
+        gerarPrompt();
+    }
+
+    function resetSelection(id) {
+        document.getElementById(id).selectedIndex = 0;
+    }
+
+    function toggleLock(id) {
+        locks[id] = !locks[id];
+    }
+	
+	function clearPrompt() {
+		document.getElementById("resultado").innerHTML = "";
+		for (var i = 0; i < selecoes.length; i++) {
+			var id = selecoes[i];
+			document.getElementById(id).selectedIndex = 0;
+			document.getElementById(id + "Personalizado").value = "";
+		}
+	}
+    // Chamar gerarPrompt() quando a página é carregada
+	window.onload = function() {
+		gerarPrompt();
+		for (var i = 0; i < selecoes.length; i++) {
+			var id = selecoes[i];
+			document.getElementById(id).addEventListener('change', gerarPrompt);
+		}
+	}
+</script>
