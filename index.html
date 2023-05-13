@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Gerador de Prompts</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+
+    <title>Gerador de Prompts</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,7 +17,9 @@
             color: #fafafa;
         }
 
-        select, button, input {
+        select,
+        button,
+        input {
             padding: 10px;
             margin-top: 10px;
             font-size: 16px;
@@ -30,37 +35,92 @@
             align-items: center;
             justify-content: center;
         }
+
+        .select2-container--default .select2-selection__rendered {
+            color: red !important;
+            font-style: italic !important;
+        }
+        
+        .select2-container--default .select2-results__option {
+            color: black; /* ou qualquer outra cor que você preferir */
+        }
+
+        /* Código novo */
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            color: black !important; /* altere "black" para a cor que preferir */
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: black !important; /* altere "black" para a cor que preferir */
+        }
+				label {
+			font-size: 20px;
+			font-weight: bold;
+			color: #EDEF43;
+		}
     </style>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 </head>
 <body>
-	<h1>Gerador de Prompts</h1>
+    <h1>Gerador de Prompts</h1>
     <div>
-    <select id="tipoDeImagem">
-        <option value="">Selecione um tipo de imagem</option>
-        <option value="a cartoon of">a cartoon of</option>
-        <option value="a depiction of">a depiction of</option>
-        <option value="a drawing of">a drawing of</option>
-        <option value="a figure of">a figure of</option>
-        <option value="a headshot of">a headshot of</option>
+	<label for="estabelecimentoDaqualidade">Estabelecimento da Qualidade</label>
+    <select id="estabelecimentoDaqualidade" multiple="multiple">
+		<option value="Masterpiece">Masterpiece</option>
+		<option value="Best Quality">Best Quality</option>
+		<option value="Ultra Detailed">Ultra Detailed</option>
+		<option value="Top Quality">Top Quality</option>
+		<option value="High Quality">High Quality</option>
+		<option value="Superior Quality">Superior Quality</option>
+		<option value="Exceptional Detail">Exceptional Detail</option>
+		<option value="Premium Quality">Premium Quality</option>
+		<option value="Fine Detail">Fine Detail</option>
+		<option value="Highly Detailed">Highly Detailed</option>
+		<option value="Exquisite Detail">Exquisite Detail</option>
+		<option value="Superior Detail">Superior Detail</option>
+		<option value="Finest Quality">Finest Quality</option>
+		<option value="Unparalleled Detail">Unparalleled Detail</option>
+		<option value="Superb Quality">Superb Quality</option>
+		<option value="High Precision">High Precision</option>
+		<option value="Artistic Excellence">Artistic Excellence</option>
+		<option value="High Definition">High Definition</option>
+		<option value="Unmatched Quality">Unmatched Quality</option>
+		<option value="Extraordinary Detail">Extraordinary Detail</option>
     </select>
-    <input type="text" id="tipoDeImagemPersonalizado" oninput="resetSelection('tipoDeImagem')">
-    <input type="checkbox" onclick="toggleLock('tipoDeImagem')"> Lock
-	</div>
-	<div>
-    <select id="sujeito">
-        <option value="">Selecione um sujeito</option>
-        <option value="a girl">a girl</option>
-        <option value="a boy">a boy</option>
-        <option value="a man">a man</option>
-        <option value="a woman">a woman</option>
+    <input type="text" id="estabelecimentoDaqualidadePersonalizado" oninput="resetSelection('estabelecimentoDaqualidade')">
+    <input type="checkbox" onclick="toggleLock('estabelecimentoDaqualidade')"> Lock
+    </div>
+    <div>
+	<label for="estiloEtecnica">Estilo e Tecnica</label>
+    <select id="estiloEtecnica" multiple="multiple">
+		<option value="Anime-style">Anime-style</option>
+		<option value="Cel shading">Cel shading</option>
+		<option value="Realistic">Realistic</option>
+		<option value="Hyper-detailed">Hyper-detailed</option>
+		<option value="Surreal">Surreal</option>
+		<option value="Abstract">Abstract</option>
+		<option value="Watercolor">Watercolor</option>
+		<option value="Photorealistic">Photorealistic</option>
+		<option value="Manga-influenced">Manga-influenced</option>
+		<option value="Cubist">Cubist</option>
+		<option value="Impressionistic">Impressionistic</option>
+		<option value="Gothic">Gothic</option>
+		<option value="Art Nouveau">Art Nouveau</option>
+		<option value="Chiaroscuro">Chiaroscuro</option>
+		<option value="Pointillism">Pointillism</option>
+		<option value="Pop Art">Pop Art</option>
+		<option value="Minimalistic">Minimalistic</option>
+		<option value="Graphic style">Graphic style</option>
+		<option value="Baroque">Baroque</option>
+		<option value="Pixel Art">Pixel Art</option>
     </select>
-    <input type="text" id="sujeitoPersonalizado" oninput="resetSelection('sujeito')">
-    <input type="checkbox" onclick="toggleLock('sujeito')"> Lock
-	</div>
+    <input type="text" id="estiloEtecnicaPersonalizado" oninput="resetSelection('estiloEtecnica')">
+    <input type="checkbox" onclick="toggleLock('estiloEtecnica')"> Lock
+    </div>
 	
     <div id="resultado"></div>
     <button onclick="copiarPrompt()">Copiar</button>
-    <button onclick="gerarAleatorio()">Gerar aleatório</button>
+    <button onclick="gerarAleatorio()">Gerar aleatorio</button>
     <div style="margin-top: 20px;">
         <button onclick="toggleQuality()">Mas.BestQ</button>
     </div>
@@ -68,47 +128,73 @@
 
 <script>
     var qualityEnabled = false;
-    var selecoes = ["tipoDeImagem", "sujeito"];
+    var selecoes = ["estabelecimentoDaqualidade", "estiloEtecnica"];
     var locks = {};
 
-	window.onload = function() {
-		gerarPrompt();
-		for (var i = 0; i < selecoes.length; i++) {
-			var id = selecoes[i];
-			document.getElementById(id).addEventListener('change', gerarPrompt);
-		}
-	}
-
     function gerarPrompt() {
-        var tipoDeImagem = document.getElementById("tipoDeImagemPersonalizado").value || document.getElementById("tipoDeImagem").value;
-        var sujeito = document.getElementById("sujeitoPersonalizado").value || document.getElementById("sujeito").value;
+        var estabelecimentoDaqualidade = document.getElementById("estabelecimentoDaqualidadePersonalizado").value || $('#estabelecimentoDaqualidade').val().join(", ");
+        var estiloEtecnica = document.getElementById("estiloEtecnicaPersonalizado").value || $('#estiloEtecnica').val().join(", ");
 
-        var prompt = tipoDeImagem + " " + sujeito;
+        var prompt = "";
+        if(estabelecimentoDaqualidade !== "") prompt += estabelecimentoDaqualidade;
+        if(estiloEtecnica !== "" && prompt !== "") prompt += ", " + estiloEtecnica;
+        else if(estiloEtecnica !== "") prompt += estiloEtecnica;
 
         if (qualityEnabled) {
-            prompt = "masterpiece, best quality, " + prompt;
+            if(prompt !== "") prompt = "masterpiece, best quality, " + prompt;
+            else prompt = "masterpiece, best quality";
         }
 
         document.getElementById("resultado").innerHTML = prompt;
     }
+</script>
 
-    function copiarPrompt() {
-        var textArea = document.createElement("textarea");
-        textArea.value = document.getElementById("resultado").textContent;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand("Copy");
-        textArea.remove();
-    }
+
+<script>
+		window.onload = function() {
+			$('select').select2({
+				templateResult: formatOption
+			});
+
+			$('select').on('select2:select', function (e) {
+				var data = e.params.data;
+				$(data.element).removeAttr('style');
+				$(this).trigger('change');
+				gerarPrompt();
+			});
+
+			$('select').on('select2:unselect', function (e) {
+				gerarPrompt();
+			});
+
+			gerarPrompt();
+			for (var i = 0; i < selecoes.length; i++) {
+				var id = selecoes[i];
+				document.getElementById(id).addEventListener('change', gerarPrompt);
+			}
+		}
+
+		function formatOption (option) {
+			var optText = $(option.element).text();
+			if (option.value == "header") { 
+				return $('<span style="color:red;">' + optText + '</span>');
+			}
+			return option.text;
+		};
+
 	function gerarAleatorio() {
 		for (var i = 0; i < selecoes.length; i++) {
 			var id = selecoes[i];
 			if (!locks[id]) {
-				document.getElementById(id).selectedIndex = Math.floor(Math.random() * 5) + 1;
+				var select = document.getElementById(id);
+				var optionsCount = select.options.length;
+				select.selectedIndex = Math.floor(Math.random() * optionsCount);
+				$(select).trigger('change');
 			}
 		}
 		gerarPrompt();
 	}
+
     function toggleQuality() {
         qualityEnabled = !qualityEnabled;
         gerarPrompt();
@@ -121,21 +207,19 @@
     function toggleLock(id) {
         locks[id] = !locks[id];
     }
-	
-	function clearPrompt() {
-		document.getElementById("resultado").innerHTML = "";
-		for (var i = 0; i < selecoes.length; i++) {
-			var id = selecoes[i];
-			document.getElementById(id).selectedIndex = 0;
-			document.getElementById(id + "Personalizado").value = "";
-		}
-	}
-    // Chamar gerarPrompt() quando a página é carregada
-	window.onload = function() {
-		gerarPrompt();
-		for (var i = 0; i < selecoes.length; i++) {
-			var id = selecoes[i];
-			document.getElementById(id).addEventListener('change', gerarPrompt);
-		}
-	}
+
+    function clearPrompt() {
+        document.getElementById("resultado").innerHTML = "";
+        for (var i = 0; i < selecoes.length; i++) {
+            var id = selecoes[i];
+            document.getElementById(id + "Personalizado").value = "";
+            var select = document.getElementById(id);
+            for (var j = 0; j < select.options.length; j++) {
+                select.options[j].selected = false;
+            }
+            $(select).trigger('change');
+        }
+    }
 </script>
+
+
